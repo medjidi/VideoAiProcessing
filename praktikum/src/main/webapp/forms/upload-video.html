@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Загрузить видео</title>
+</head>
+<body>
+<form role="form">
+    <h3>Загрузить видео</h3>
+    <div class="control-group">
+        <label class="control-label" for="video">Выберите видео файл (необязательно):</label>
+        <div class="controls">
+            <input type="file" id="video" cam-variable-name="video" cam-variable-type="File" cam-max-filesize="100000000" /> <!-- 100 MB -->
+        </div>
+    </div>
+
+    <script cam-script type="text/form-script">
+        camForm.on('form-loaded', function() {
+            console.log('Форма загружена');
+        });
+
+        camForm.on('submit', function(evt) {
+            var fileInput = document.getElementById('video');
+            if (fileInput.files[0]) {
+                console.log('Файл выбран:', fileInput.files[0].name);
+            } else {
+                console.log('Файл не выбран');
+            }
+        });
+    </script>
+</form>
+</body>
+</html>

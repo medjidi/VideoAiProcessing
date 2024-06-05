@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0daqros" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.17.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.19.0">
+  <bpmn:process id="videoProcessing" name="videoProcessing" isExecutable="true" camunda:historyTimeToLive="180">
+    <bpmn:startEvent id="StartEvent_1" camunda:formRefBinding="latest">
+      <bpmn:outgoing>Flow_0nnp0rn</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0nnp0rn" sourceRef="StartEvent_1" targetRef="Activity_159dipt" />
+    <bpmn:scriptTask id="Activity_159dipt" name="Инициализация переменных" scriptFormat="groovy">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="Dengi">123</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0nnp0rn</bpmn:incoming>
+      <bpmn:outgoing>Flow_10k1xhb</bpmn:outgoing>
+      <bpmn:script></bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:userTask id="Activity_1dpe7i6" name="Загрузить видео" camunda:formKey="embedded:app:forms/upload-video.html">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:outputParameter name="video">${video}</camunda:outputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_10k1xhb</bpmn:incoming>
+      <bpmn:outgoing>Flow_0obc37t</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_10k1xhb" sourceRef="Activity_159dipt" targetRef="Activity_1dpe7i6" />
+    <bpmn:endEvent id="Event_0ldi2wq">
+      <bpmn:incoming>Flow_157hkbj</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0obc37t" sourceRef="Activity_1dpe7i6" targetRef="Activity_1loefrx" />
+    <bpmn:sequenceFlow id="Flow_157hkbj" sourceRef="Activity_01dc341" targetRef="Event_0ldi2wq" />
+    <bpmn:userTask id="Activity_01dc341" name="Получить результат" camunda:formKey="embedded:app:forms/get-video.html">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="objectTable">${objectTable}</camunda:inputParameter>
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_01gglaj</bpmn:incoming>
+      <bpmn:outgoing>Flow_157hkbj</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_0lkkmq7" sourceRef="Activity_1loefrx" targetRef="Activity_1aj9f7q" />
+    <bpmn:serviceTask id="Activity_1loefrx" name="Разбить видео на кадры" camunda:class="com.misis.praktikum.serviceTask.VideoToFramesDelegate">
+      <bpmn:incoming>Flow_0obc37t</bpmn:incoming>
+      <bpmn:outgoing>Flow_0lkkmq7</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1v6y43u" sourceRef="Activity_1aj9f7q" targetRef="Gateway_0b2uhi9" />
+    <bpmn:serviceTask id="Activity_1aj9f7q" name="Отправить кадры в inference" camunda:class="com.misis.praktikum.serviceTask.SendFramesDelegate">
+      <bpmn:incoming>Flow_0lkkmq7</bpmn:incoming>
+      <bpmn:outgoing>Flow_1v6y43u</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:eventBasedGateway id="Gateway_0b2uhi9">
+      <bpmn:incoming>Flow_1v6y43u</bpmn:incoming>
+      <bpmn:outgoing>Flow_04pu9lx</bpmn:outgoing>
+    </bpmn:eventBasedGateway>
+    <bpmn:intermediateCatchEvent id="Event_1efgwwg">
+      <bpmn:incoming>Flow_04pu9lx</bpmn:incoming>
+      <bpmn:outgoing>Flow_0vb37h8</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="MessageEventDefinition_0li2nyv" messageRef="Message_0gmfhic" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_04pu9lx" sourceRef="Gateway_0b2uhi9" targetRef="Event_1efgwwg" />
+    <bpmn:sequenceFlow id="Flow_0vb37h8" sourceRef="Event_1efgwwg" targetRef="Activity_1xavytd" />
+    <bpmn:sequenceFlow id="Flow_01gglaj" sourceRef="Activity_1xavytd" targetRef="Activity_01dc341" />
+    <bpmn:serviceTask id="Activity_1xavytd" name="Обработать ответ" camunda:class="com.misis.praktikum.serviceTask.ReceiveFramesDelegate">
+      <bpmn:incoming>Flow_0vb37h8</bpmn:incoming>
+      <bpmn:outgoing>Flow_01gglaj</bpmn:outgoing>
+    </bpmn:serviceTask>
+  </bpmn:process>
+  <bpmn:signal id="Signal_2peu5vc" name="FramesProcessedSignal" />
+  <bpmn:message id="Message_0gmfhic" name="FramesProcessedMessage" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="videoProcessing">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_159dipt_di" bpmnElement="Activity_159dipt">
+        <dc:Bounds x="330" y="77" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1dpe7i6_di" bpmnElement="Activity_1dpe7i6">
+        <dc:Bounds x="550" y="77" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0ldi2wq_di" bpmnElement="Event_0ldi2wq">
+        <dc:Bounds x="1802" y="92" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0wd0guv_di" bpmnElement="Activity_01dc341">
+        <dc:Bounds x="1580" y="77" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_19actpv_di" bpmnElement="Activity_1loefrx">
+        <dc:Bounds x="720" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0hannlq_di" bpmnElement="Activity_1aj9f7q">
+        <dc:Bounds x="890" y="77" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0b2uhi9_di" bpmnElement="Gateway_0b2uhi9">
+        <dc:Bounds x="1055" y="92" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1efgwwg_di" bpmnElement="Event_1efgwwg">
+        <dc:Bounds x="1172" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1b1cw4h_di" bpmnElement="Activity_1xavytd">
+        <dc:Bounds x="1260" y="77" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0nnp0rn_di" bpmnElement="Flow_0nnp0rn">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="330" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_10k1xhb_di" bpmnElement="Flow_10k1xhb">
+        <di:waypoint x="430" y="117" />
+        <di:waypoint x="550" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0obc37t_di" bpmnElement="Flow_0obc37t">
+        <di:waypoint x="650" y="117" />
+        <di:waypoint x="720" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_157hkbj_di" bpmnElement="Flow_157hkbj">
+        <di:waypoint x="1680" y="110" />
+        <di:waypoint x="1802" y="110" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0lkkmq7_di" bpmnElement="Flow_0lkkmq7">
+        <di:waypoint x="820" y="117" />
+        <di:waypoint x="890" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1v6y43u_di" bpmnElement="Flow_1v6y43u">
+        <di:waypoint x="990" y="117" />
+        <di:waypoint x="1055" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_04pu9lx_di" bpmnElement="Flow_04pu9lx">
+        <di:waypoint x="1105" y="117" />
+        <di:waypoint x="1172" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0vb37h8_di" bpmnElement="Flow_0vb37h8">
+        <di:waypoint x="1208" y="117" />
+        <di:waypoint x="1260" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_01gglaj_di" bpmnElement="Flow_01gglaj">
+        <di:waypoint x="1360" y="117" />
+        <di:waypoint x="1580" y="117" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

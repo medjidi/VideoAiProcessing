@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Object Table</title>
+</head>
+<body>
+<h2>Detected Objects in Frames</h2>
+<form>
+    <pre id="objectTable">Loading...</pre>
+</form>
+
+<script cam-script type="text/form-script">
+    camForm.on('form-loaded', function() {
+        var objectTableVar = camForm.variableManager.variableValue('objectTable');
+        var objectTableElement = document.getElementById('objectTable');
+
+        if (objectTableVar) {
+            objectTableElement.textContent = objectTableVar;
+        } else {
+            objectTableElement.textContent = "No data available.";
+        }
+    });
+
+    camForm.on('variables-fetched', function() {
+        camForm.variableManager.fetchVariable('objectTable');
+    });
+</script>
+</body>
+</html>
